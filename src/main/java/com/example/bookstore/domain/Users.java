@@ -2,9 +2,13 @@ package com.example.bookstore.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "users")
+import java.util.HashSet;
+import java.util.Set;
+
+@Document
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString
@@ -18,9 +22,25 @@ public class Users {
     @NonNull
     private String name;
 
+    @NonNull
+    private String password;
+
+    @NonNull
+    @Transient
+    private String confirmPassword;
+
+    @NonNull
+    private String email;
+
     private ShoppingCart shoppingCart;
 
     private Wishlist wishlist;
 
     private Review review;
+
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
 }
