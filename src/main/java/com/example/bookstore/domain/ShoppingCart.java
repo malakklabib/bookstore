@@ -13,5 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ShoppingCart {
+
     List<Book> shoppingCartItems = new ArrayList<>();
+
 }

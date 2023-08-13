@@ -20,5 +20,6 @@ public class Order {
     @NonNull
     private String status;
 
+    @NonNull
     private List<OrderItem> orderItems= new ArrayList<>();
 }

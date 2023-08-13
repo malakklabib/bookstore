@@ -4,22 +4,22 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Collection;
+
 @Document
 @RequiredArgsConstructor
-@NoArgsConstructor
-@ToString
 @Getter
 @Setter
-public class Review {
+@ToString
+@NoArgsConstructor
+public class Role {
 
     @Id
-    String id;
+    private Long id;
 
     @NonNull
-    int rating;
+    private String name;
 
-    @NonNull
-    Users user;
+    private Collection<Users> users;
 
-    String body;
 }
