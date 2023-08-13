@@ -4,8 +4,6 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Collection;
-
 @Document
 @RequiredArgsConstructor
 @Getter
@@ -20,6 +18,5 @@ public class Role {
     @NonNull
     private String name;
 
-    private Collection<Users> users;
 
 }

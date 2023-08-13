@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @NoArgsConstructor
 @ToString
 @Getter
