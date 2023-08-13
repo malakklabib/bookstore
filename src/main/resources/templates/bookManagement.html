@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+</head>
+<body>
+<h1>Welcome to the Admin Page</h1>
+
+<div th:if="${success}">
+    <p class="success-message">Operation successful!</p>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ISBN</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.isbn}"></td>
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.author}"></td>
+        <td th:text="${book.price}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Add New Book</h2>
+<form th:action="@{/addNewBook}" th:object="${book}" method="post">
+    <label for="isbn">ISBN:</label>
+    <input type="text" id="isbn" th:field="*{isbn}" /><br/>
+    <label for="title">Title:</label>
+    <input type="text" id="title" th:field="*{title}" /><br/>
+    <label for="author">Author:</label>
+    <input type="text" id="author" th:field="*{author}" /><br/>
+    <label for="price">Price:</label>
+    <input type="text" id="price" th:field="*{price}" /><br/>
+    <button type="submit">Add Book</button>
+</form>
+
+<h2>Update Book</h2>
+<form th:action="@{/{isbn}}" th:object="${newBook}" method="post">
+    <label for="updatedIsbn">ISBN:</label>
+    <input type="text" id="updatedIsbn" th:field="*{isbn}" /><br/>
+    <label for="updatedTitle">Title:</label>
+    <input type="text" id="updatedTitle" th:field="*{title}" /><br/>
+    <label for="updatedAuthor">Author:</label>
+    <input type="text" id="updatedAuthor" th:field="*{author}" /><br/>
+    <label for="updatedPrice">Price:</label>
+    <input type="text" id="updatedPrice" th:field="*{price}" /><br/>
+    <button type="submit">Update Book</button>
+</form>
+
+</body>
+</html>
