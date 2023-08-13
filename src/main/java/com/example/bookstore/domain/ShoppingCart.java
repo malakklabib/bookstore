@@ -7,13 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document
-//@RequiredArgsConstructor
 @NoArgsConstructor
 @ToString
 @Getter
 @Setter
 public class ShoppingCart {
 
-    List<Book> shoppingCartItems = new ArrayList<>();
+    private List<Book> shoppingCartItems = new ArrayList<>();
+
+    public void addItem(Book b){
+        shoppingCartItems.add(b);
+    }
 
 }

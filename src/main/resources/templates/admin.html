@@ -1,10 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>this is the admin page</title>
+    <title>Admin Page</title>
 </head>
 <body>
+<h1>Welcome Admin</h1>
 
+<table>
+    <thead>
+    <tr>
+        <th>ISBN</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.isbn}">ISBN</td>
+        <td th:text="${book.title}">Title</td>
+        <td th:text="${book.author}">Author</td>
+        <td th:text="${book.price}">Price</td>
+
+        <button onclick="redirectToPageUpdate('bookForm.html', book)">Update Book</button>
+        <button onclick="toggleForm('form')">Delete Book</button>
+    </tr>
+    </tbody>
+</table>
+
+<button onclick="redirectToPage('bookForm.html')">Add New Book</button>
+
+<form th:action="@{/admin}" th:object="${book}"  method="POST" style="display: none;">
+    <input type="hidden" name="key1" value="value1">
+    <input type="hidden" name="key2" value="value2">
+</form>
+
+<script>
+    function toggleForm(formId) {
+        var form = document.getElementById(formId);
+        if (form.style.display === "none") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+    function redirectToPage(URL){
+        document.location.href = URL
+    }
+
+    function redirectToPageUpdate(URL, obj){
+        document.
+    }
+
+</script>
 </body>
 </html>

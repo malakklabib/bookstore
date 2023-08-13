@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class OrderItem {
 
     @Id
-    String isbn;
+    private String isbn;
 
     @NonNull
-    int price;
+    private int price;
 
 }

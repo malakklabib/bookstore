@@ -13,13 +13,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Review {
 
     @Id
-    String id;
+    private String id;
 
     @NonNull
-    int rating;
+    private int rating;
 
     @NonNull
-    Users user;
+    private Users user;
 
-    String body;
+    @NonNull
+    private String body;
 }

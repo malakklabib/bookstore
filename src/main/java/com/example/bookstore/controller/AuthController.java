@@ -34,6 +34,7 @@ public class AuthController {
         return "auth/register";
     }
 
+
     @PostMapping("/register")
     public String registerNewUser(@Valid Users user, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if( bindingResult.hasErrors() ) {

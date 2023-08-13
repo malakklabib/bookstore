@@ -43,19 +43,16 @@ public class Users implements UserDetails {
     private String confirmPassword;
 
     @NonNull
-    @Size(min = 10, max = 25, message = "Please enter your full name")
+    @Size(min = 10, max = 25, message = "Please enter a valid email")
     @NotEmpty(message = "Please enter your email")
     private String email;
 
+    @NonNull
     private ShoppingCart shoppingCart;
 
     @NonNull
     private Wishlist wishlist;
 
-    @NonNull
-    private Review review;
-
-    @NonNull
     private Set<Role> roles = new HashSet<>();
 
     public void addRole(Role role) {

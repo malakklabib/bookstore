@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document
-//@RequiredArgsConstructor
 @NoArgsConstructor
 @ToString
 @Getter
 @Setter
 public class Wishlist {
 
-    List<Book> wishlistItems = new ArrayList<>();
+    private List<Book> wishlistItems = new ArrayList<>();
+
+    public void addItem(Book b){
+        wishlistItems.add(b);
+    }
 }
