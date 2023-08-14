@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>add new book</title>
+</head>
+<body>
+
+<h2>Add New Book</h2>
+
+<div class="row" th:if="${validationErrors}">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+            <span class="text-danger align-middle">
+                <ul th:each="error : ${validationErrors}">
+                    <li th:text="${error.getDefaultMessage()}"></li>
+                </ul>
+            </span>
+    </div>
+</div>
+
+
+<form th:action="@{/saveBookAdd}" th:object="${book}" method="post">
+    <label for="isbn">ISBN:</label>
+    <input type="text" id="isbn" th:field="*{isbn}" /><br/>
+    <label for="title">Title:</label>
+    <input type="text" id="title" th:field="*{title}" /><br/>
+    <label for="author">Author:</label>
+    <input type="text" id="author" th:field="*{author}" /><br/>
+    <label for="price">Price:</label>
+    <input type="text" id="price" th:field="*{price}" /><br/>
+    <button type="submit">Add Book</button>
+</form>
+</body>
+</html>

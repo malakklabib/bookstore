@@ -1,19 +1,23 @@
 package com.example.bookstore.controller;
 
+import com.example.bookstore.domain.Book;
 import com.example.bookstore.domain.Users;
 import com.example.bookstore.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
-@Controller
+@RestController
 public class AuthController {
 
     private final UserService userService;
@@ -23,31 +27,21 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @GetMapping("/login")
-    public String login(){
-        return "auth/login";
+    @PostMapping("/login")
+    public ResponseEntity<Users> login(@RequestBody @Valid Users user, BindingResult bindingResult){
+        if(bindingResult.hasErrors())
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(user);
     }
-
-    @GetMapping("/register")
-    public String register(Model m){
-        m.addAttribute("user", new Users());
-        return "auth/register";
-    }
-
 
     @PostMapping("/register")
-    public String registerNewUser(@Valid Users user, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-        if( bindingResult.hasErrors() ) {
-            logger.info("Validation errors were found while registering a new user");
-            model.addAttribute("user",user);
-            model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "auth/register";
-        } else {
-            Users newUser = userService.register(user);
-            redirectAttributes
-                    .addAttribute("id",newUser.getId())
-                    .addFlashAttribute("success",true);
-            return "redirect:/register";
+    public ResponseEntity<Users> registerNewUser(@RequestBody @Valid Users user, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().build();
         }
+
+        Users savedUser = userService.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 }

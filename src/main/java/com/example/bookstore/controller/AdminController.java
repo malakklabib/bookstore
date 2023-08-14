@@ -4,15 +4,22 @@ import com.example.bookstore.domain.Book;
 import com.example.bookstore.service.BookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
+@Secured("ROLE_ADMIN")
+@RequestMapping("/admin")
 public class AdminController {
 
     private final BookService bookService;
@@ -23,74 +30,53 @@ public class AdminController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/bookManagement")
-    public String manageBooks(Model m){
-        m.addAttribute("books", bookService.findAll());
-        return "bookManagement";
+    @GetMapping("/")
+    public ResponseEntity<List<Book>> manageBooks(){
+        return ResponseEntity.ok(bookService.findAll());
     }
 
-    @PostMapping("/bookManagement/addNewBook")
-    public String addNewBook(@ModelAttribute Book book, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
+    @PostMapping("/addBook")
+    public ResponseEntity<Book> createBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
 
-        if(bindingResult.hasErrors()){
-            logger.info("Not a valid book");
-            model.addAttribute("book", book);
-            model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "bookManagement";
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().build();
         }
 
-        bookService.save(book);
-        redirectAttributes
-                .addAttribute("id",book.getIsbn())
-                .addFlashAttribute("success",true);
-
-        return "redirect:/bookManagement";
+        Book savedBook = bookService.save(book);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
-    @PutMapping("/bookManagement/{isbn}")
-    public String updateBook(@PathVariable String isbn, @ModelAttribute Book newBook, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
 
-        Optional<Book> oldBook = bookService.findById(isbn);
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable String id, @RequestBody @Valid Book updatedBook, BindingResult bindingResult) {
 
-        if(!oldBook.isPresent()){
-            logger.info("Book not found");
-            model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "bookManagement";
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().build();
         }
 
-        if(bindingResult.hasErrors()){
-            logger.info("Not a valid book");
-            model.addAttribute("newBook", newBook);
-            model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "bookManagement";
+        Optional<Book> existingBook = bookService.findById(id);
+        if (!existingBook.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
 
-        bookService.delete(oldBook.get());
-        bookService.save(newBook);
-        redirectAttributes
-                .addAttribute("id",newBook.getIsbn())
-                .addFlashAttribute("success",true);
-
-        return "redirect:/bookManagement";
+        updatedBook.setIsbn(id);
+        Book savedBook = bookService.save(updatedBook);
+        return ResponseEntity.ok(savedBook);
     }
 
-    @DeleteMapping ("/bookManagement/{isbn}")
-    public String deleteBook(@PathVariable String isbn, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes){
+    @DeleteMapping ("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable String id){
 
-        Optional<Book> b = bookService.findById(isbn);
+        Optional<Book> b = bookService.findById(id);
 
-        if(!b.isPresent()){
-            logger.info("Book not found");
-            model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "bookManagement";
+        if (!b.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
 
         bookService.delete(b.get());
-        redirectAttributes.addFlashAttribute("success",true);
 
-        return "redirect:/bookManagement";
+        return ResponseEntity.noContent().build();
     }
-
 
 
 

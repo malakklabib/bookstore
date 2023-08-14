@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+</head>
+<body>
+<h1>Welcome, Admin!</h1>
+
+<div th:if="${success}">
+    <p class="success-message">Operation successful!</p>
+</div>
+
+<a th:href="@{/addForm}">Add New Book</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>ISBN</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Price</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="*{book.isbn}"></td>
+        <td th:text="*{book.title}"></td>
+        <td th:text="*{book.author}"></td>
+        <td th:text="*{book.price}"></td>
+        <td>
+        <a th:href="@{/updateForm/{id} (id=${book.isbn})}">Update Book</a>
+        </td>
+        <td>
+        <a th:href="@{/delete/{id} (id=${book.isbn})}">Delete Book</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
