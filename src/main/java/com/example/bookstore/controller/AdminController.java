@@ -18,19 +18,16 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@Secured("ROLE_ADMIN")
 @RequestMapping("/admin")
 public class AdminController {
 
     private final BookService bookService;
 
-    private final Logger logger = LoggerFactory.getLogger(AdminController.class);
-
     public AdminController(BookService bookService) {
         this.bookService = bookService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<Book>> manageBooks(){
         return ResponseEntity.ok(bookService.findAll());
     }

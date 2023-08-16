@@ -6,6 +6,8 @@ import com.example.bookstore.repo.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -28,7 +30,7 @@ public class UserService {
 
         user.setConfirmPassword(secret);
 
-        user.addRole(roleService.findByName("ROLE_USER"));
+        user.setRole(roleService.findByName("ROLE_USER"));
 
 //        user.setActivationCode(UUID.randomUUID().toString());
 //
@@ -42,4 +44,7 @@ public class UserService {
     }
 
 
+    public Users findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
+    }
 }

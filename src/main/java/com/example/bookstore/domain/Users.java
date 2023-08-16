@@ -1,5 +1,8 @@
 package com.example.bookstore.domain;
 
+import com.example.bookstore.domain.Role;
+import com.example.bookstore.domain.ShoppingCart;
+import com.example.bookstore.domain.Wishlist;
 import com.example.bookstore.domain.validator.PasswordsMatch;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @PasswordsMatch
-public class Users implements UserDetails {
+public class Users{
 
     @Id
     private String id;
@@ -53,39 +56,6 @@ public class Users implements UserDetails {
     @NonNull
     private Wishlist wishlist;
 
-    private Set<Role> roles = new HashSet<>();
-
-    public void addRole(Role role) {
-        roles.add(role);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @NonNull
+    private Role role;
 }
