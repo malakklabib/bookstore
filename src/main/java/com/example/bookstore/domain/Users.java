@@ -1,8 +1,5 @@
 package com.example.bookstore.domain;
 
-import com.example.bookstore.domain.Role;
-import com.example.bookstore.domain.ShoppingCart;
-import com.example.bookstore.domain.Wishlist;
 import com.example.bookstore.domain.validator.PasswordsMatch;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -15,9 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Document
 @NoArgsConstructor
@@ -26,7 +21,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @PasswordsMatch
-public class Users{
+public class Users implements UserDetails {
 
     @Id
     private String id;
@@ -58,4 +53,34 @@ public class Users{
 
     @NonNull
     private Role role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(role.getName()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

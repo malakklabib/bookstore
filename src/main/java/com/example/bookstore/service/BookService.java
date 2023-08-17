@@ -32,12 +32,7 @@ public class BookService {
     }
 
     public Optional<Book> findById(String id) {
-        Optional<Book> b = bookRepository.findById(id);
-
-        if(!b.isPresent())
-            logger.info("Book is not found");
-
-        return b;
+        return  bookRepository.findById(id);
     }
 
     public void delete(Book book){
