@@ -17,31 +17,22 @@ public class ShoppingCartService {
     private final UserService userService;
     private final ShoppingCartRepository shoppingCartRepository;
 
-    public List<Book> getCartContents(Authentication auth) throws Exception {
-
-        Users u = userService.validate(auth);
-
+    public List<Book> getCartContents(Users u){
         return u.getShoppingCart().getShoppingCartItems();
     }
 
-    public void addToCart(Book b, Authentication auth) throws Exception {
-
-        Users u = userService.validate(auth);
+    public void addToCart(Users u, Book b){
         ShoppingCart shoppingCart = u.getShoppingCart();
-
         shoppingCart.addItem(b);
         save(shoppingCart);
         userService.save(u);
     }
 
-    public void removeFromCart(Book b, Authentication auth) throws Exception {
-        Users u = userService.validate(auth);
+    public void removeFromCart(Users u, Book b){
         ShoppingCart shoppingCart = u.getShoppingCart();
-
         shoppingCart.removeItem(b);
         save(shoppingCart);
         userService.save(u);
-
     }
 
     public ShoppingCart save(ShoppingCart shoppingCart) {

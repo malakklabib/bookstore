@@ -5,6 +5,7 @@ import com.example.bookstore.domain.Users;
 import com.example.bookstore.service.BookService;
 import com.example.bookstore.service.UserService;
 import com.example.bookstore.service.WishlistService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,53 +17,59 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/wishlist")
+@RequiredArgsConstructor
 public class WishlistController {
 
     private final WishlistService wishlistService;
+    private final UserService userService;
+    private final BookService bookService;
 
-    public WishlistController(WishlistService wishlistService) {
-        this.wishlistService = wishlistService;
-    }
-
-    @GetMapping("/items")
+    @GetMapping("/wishlist")
     public ResponseEntity<List<Book>> getWishlistItems(Authentication authentication) {
         try {
-            List<Book> shoppingCartItems = wishlistService.getWishlistBooks(authentication);
-            return ResponseEntity.ok(shoppingCartItems);
+            Users u = userService.validate(authentication);
+            List<Book> wishlistBooks = wishlistService.getWishlistBooks(u);
+            return ResponseEntity.ok(wishlistBooks);
         }
-        catch (Exception e) {
+        catch(Exception e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addToWishlist(@Valid @RequestBody Book book, BindingResult bindingResult, Authentication authentication) {
+    @PostMapping("{bookId}/addToWishlist")
+    public ResponseEntity<String> addToCart(@PathVariable String bookId, Authentication authentication) {
 
-        if(bindingResult.hasErrors())
-            return ResponseEntity.notFound().build();
-
+        Users u;
         try {
-            wishlistService.addToWishlist(book, authentication);
-            return ResponseEntity.ok("Book added to wishlist.");
-        }
-        catch (Exception e){
+            u = userService.validate(authentication);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        Optional<Book> b = bookService.findById(bookId);
+        if (b.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        wishlistService.addToWishlist(u, b.get());
+        return ResponseEntity.ok("Book added to wishlist.");
     }
 
-    @DeleteMapping("/remove")
-    public ResponseEntity<String> removeFromWishlist(@Valid @RequestBody Book book, BindingResult bindingResult, Authentication authentication) {
+    @DeleteMapping("{bookId}/removeFromWishlist")
+    public ResponseEntity<String> removeFromCart(@PathVariable String bookId, Authentication authentication) {
 
-        if(bindingResult.hasErrors())
-            return ResponseEntity.notFound().build();
-
+        Users u;
         try {
-            wishlistService.removeFromWishlist(book, authentication);
-            return ResponseEntity.ok("Book removed from wishlist.");
+            u = userService.validate(authentication);
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        Optional<Book> b = bookService.findById(bookId);
+        if(b.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        wishlistService.removeFromWishlist(u,b.get());
+        return ResponseEntity.ok("Book removed from wishlist.");
     }
 }

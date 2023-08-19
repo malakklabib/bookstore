@@ -9,7 +9,6 @@ import java.util.List;
 
 @Document
 @NoArgsConstructor
-@RequiredArgsConstructor
 @ToString
 @Getter
 @Setter
@@ -18,8 +17,7 @@ public class ShoppingCart {
     @Id
     private String shoppingCartId;
 
-    @NonNull
-    private List<Book> shoppingCartItems;
+    private List<Book> shoppingCartItems = new ArrayList<>();
 
 
     public void addItem(Book b){

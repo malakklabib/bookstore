@@ -19,29 +19,27 @@ public class WishlistService {
     private final UserService userService;
     private final WishlistRepository wishlistRepository;
 
-    public List<Book> getWishlistBooks(Authentication auth) throws Exception {
-        Users u = userService.validate(auth);
+    public List<Book> getWishlistBooks(Users u) {
         return u.getWishlist().getWishlistItems();
     }
 
 
-    public void addToWishlist(Book b, Authentication auth) throws Exception {
-        Users u = userService.validate(auth);
+    public void addToWishlist(Users u, Book b) {
         Wishlist wishlist = u.getWishlist();
-
         wishlist.addItem(b);
         save(wishlist);
         userService.save(u);
     }
 
 
-    public void removeFromWishlist(Book b, Authentication auth) throws Exception {
-        Users u = userService.validate(auth);
+    public String removeFromWishlist(Users u, Book b){
         Wishlist wishlist = u.getWishlist();
-
+        if(!wishlist.getWishlistItems().contains(b))
+            return "Book is not in your wishlist";
         wishlist.removeItem(b);
         save(wishlist);
         userService.save(u);
+        return "Book removed from wishlist.";
     }
 
     public void save(Wishlist wishlist) {

@@ -3,9 +3,7 @@ package com.example.bookstore.controller;
 import com.example.bookstore.domain.Book;
 import com.example.bookstore.service.BookService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +23,12 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-//    @GetMapping("/{id}")
-//    public Optional<Book> readBook(@PathVariable String id, Model model){
-//        model.addAttribute("book",bookService.findById(id));
-//        return "";
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> readBook(@PathVariable String id){
+        Optional<Book> book = bookService.findById(id);
+        if(book.isEmpty())
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(book.get());
+    }
 
 }

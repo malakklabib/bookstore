@@ -19,7 +19,7 @@ public class Review {
     private int rating;
 
     @NonNull
-    private Users user;
+    private Book book;
 
     @NonNull
     private String body;
