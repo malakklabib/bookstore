@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Document
 @RequiredArgsConstructor
@@ -18,8 +19,17 @@ public class Order {
     private String id;
 
     @NonNull
-    private String status;
+    private String userId;
 
     @NonNull
+    private Status status;
+
+    @NonNull
+    private int total;
+
     private List<OrderItem> orderItems= new ArrayList<>();
+
+    public Optional<OrderItem> findOrderItem(String orderItemId){
+        return orderItems.stream().filter(orderItem -> orderItem.getIsbn().equals(orderItemId)).findFirst();
+    }
 }

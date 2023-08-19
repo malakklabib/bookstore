@@ -1,7 +1,11 @@
 package com.example.bookstore.controller;
 
 import com.example.bookstore.domain.Book;
+import com.example.bookstore.domain.Order;
+import com.example.bookstore.domain.Status;
 import com.example.bookstore.service.BookService;
+import com.example.bookstore.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -13,13 +17,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
     private final BookService bookService;
-
-    public AdminController(BookService bookService) {
-        this.bookService = bookService;
-    }
+    private final OrderService orderService;
 
     @GetMapping("")
     public ResponseEntity<List<Book>> manageBooks(){
@@ -53,6 +55,22 @@ public class AdminController {
         updatedBook.setIsbn(id);
         Book savedBook = bookService.save(updatedBook);
         return ResponseEntity.ok(savedBook);
+    }
+
+    @GetMapping("/updateTracking")
+    public ResponseEntity<List<Order>> updateTracking(){
+        return ResponseEntity.ok(orderService.findAll());
+    }
+
+    @PutMapping("/updateTracking/{orderId}")
+    public ResponseEntity<Void> updateTracking(@PathVariable String orderId){
+        Optional<Order> o = orderService.findById(orderId);
+        if(o.isEmpty())
+            return ResponseEntity.notFound().build();
+        Status s = o.get().getStatus() == Status.PLACED? Status.SHIPPING : Status.DELIVERED;
+        o.get().setStatus(s);
+        orderService.save(o.get());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping ("/{id}")

@@ -4,6 +4,10 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+
 @Document
 @RequiredArgsConstructor
 @NoArgsConstructor
@@ -16,11 +20,14 @@ public class Review {
     private String id;
 
     @NonNull
+    private String bookId;
+
+    @NonNull
+    @Min(value = 1, message = "minimum rating is 1")
+    @Max(value = 5, message = "maximum rating is 5")
     private int rating;
 
     @NonNull
-    private Book book;
-
-    @NonNull
+    @Size(max = 200, message = "maximum limit exceeded")
     private String body;
 }

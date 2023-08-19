@@ -23,9 +23,9 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> readBook(@PathVariable String id){
-        Optional<Book> book = bookService.findById(id);
+    @GetMapping("/{bookId}")
+    public ResponseEntity<Book> readBook(@PathVariable String bookId){
+        Optional<Book> book = bookService.findById(bookId);
         if(book.isEmpty())
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(book.get());

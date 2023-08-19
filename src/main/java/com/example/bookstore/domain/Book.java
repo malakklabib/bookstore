@@ -2,6 +2,7 @@ package com.example.bookstore.domain;
 
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,6 +10,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document
 @NoArgsConstructor
@@ -35,6 +38,9 @@ public class Book {
     @Min(value = 1, message = "please add an appropriate price")
     @Max(value = 100, message = "please add an appropriate price")
     int price;
+
+    @NonNull
+    private int avgRating;
 
 
 }

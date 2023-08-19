@@ -4,15 +4,13 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
 @RequiredArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class OrderItem {
 
-    @Id
+    @NonNull
     private String isbn;
 
     @NonNull

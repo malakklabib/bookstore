@@ -3,6 +3,8 @@ package com.example.bookstore.service;
 import com.example.bookstore.domain.Users;
 import com.example.bookstore.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,8 @@ public class UserService {
         String email = auth.getName();
         Optional<Users> user = findByEmail(email);
         if (user.isEmpty()) {
-            throw new Exception("user cannot be found");
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new Exception("user not authorized");
         }
         return user.get();
     }
