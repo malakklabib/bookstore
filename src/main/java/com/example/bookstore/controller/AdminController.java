@@ -1,10 +1,7 @@
 package com.example.bookstore.controller;
 
-import com.example.bookstore.domain.Book;
-import com.example.bookstore.domain.Order;
-import com.example.bookstore.domain.Status;
-import com.example.bookstore.service.BookService;
-import com.example.bookstore.service.OrderService;
+import com.example.bookstore.domain.*;
+import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +19,9 @@ public class AdminController {
 
     private final BookService bookService;
     private final OrderService orderService;
+    private final ShoppingCartService shoppingCartService;
+    private final WishlistService wishlistService;
+    private final ReviewService reviewService;
 
     @GetMapping("")
     public ResponseEntity<List<Book>> manageBooks(){
@@ -39,7 +39,6 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<Book> updateBook(@PathVariable String id, @RequestBody @Valid Book updatedBook, BindingResult bindingResult) {
 
@@ -48,13 +47,34 @@ public class AdminController {
         }
 
         Optional<Book> existingBook = bookService.findById(id);
-        if (!existingBook.isPresent()) {
+        if (existingBook.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         updatedBook.setIsbn(id);
         Book savedBook = bookService.save(updatedBook);
+
+        shoppingCartService.updateShoppingCarts(existingBook.get(), updatedBook);
+        wishlistService.updateWishLists(existingBook.get(), updatedBook);
+
         return ResponseEntity.ok(savedBook);
+    }
+
+    @DeleteMapping ("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable String id){
+
+        Optional<Book> b = bookService.findById(id);
+
+        if (b.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        bookService.delete(b.get());
+
+        shoppingCartService.deleteFromShoppingCarts(b.get());
+        wishlistService.deleteFromWishlists(b.get());
+        reviewService.deleteAllReviews(b.get());
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/updateTracking")
@@ -72,21 +92,5 @@ public class AdminController {
         orderService.save(o.get());
         return ResponseEntity.ok().build();
     }
-
-    @DeleteMapping ("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable String id){
-
-        Optional<Book> b = bookService.findById(id);
-
-        if (!b.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        bookService.delete(b.get());
-
-        return ResponseEntity.noContent().build();
-    }
-
-
 
 }

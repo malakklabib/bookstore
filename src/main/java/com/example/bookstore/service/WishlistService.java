@@ -31,7 +31,6 @@ public class WishlistService {
         userService.save(u);
     }
 
-
     public String removeFromWishlist(Users u, Book b){
         Wishlist wishlist = u.getWishlist();
         if(!wishlist.getWishlistItems().contains(b))
@@ -42,7 +41,43 @@ public class WishlistService {
         return "Book removed from wishlist.";
     }
 
+    public void updateWishLists(Book old, Book updated) {
+        List<Wishlist> wishlists = findAll();
+        for(Wishlist w : wishlists) {
+            List<Book> books = w.getWishlistItems();
+            if(books.contains(old)){
+                books.add(updated);
+                books.remove(old);
+                w.setWishlistItems(books);
+                save(w);
+                Users u = userService.findByWishlistId(w.getWishListId());
+                u.setWishlist(w);
+                userService.save(u);
+            }
+        }
+    }
+
+    public void deleteFromWishlists(Book book) {
+        List<Wishlist> wishlists = findAll();
+        for(Wishlist w : wishlists) {
+            List<Book> books = w.getWishlistItems();
+            books.removeAll(books.stream().filter(book1 -> book1.equals(book)).toList());
+            w.setWishlistItems(books);
+            save(w);
+            Users u = userService.findByWishlistId(w.getWishListId());
+            u.setWishlist(w);
+            userService.save(u);
+        }
+
+    }
+
     public void save(Wishlist wishlist) {
         wishlistRepository.save(wishlist);
     }
+
+    public List<Wishlist> findAll() {
+        return wishlistRepository.findAll();
+    }
+
+
 }

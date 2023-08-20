@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +20,21 @@ public class Order {
     private String id;
 
     @NonNull
-    private String userId;
-
-    @NonNull
     private Status status;
 
     @NonNull
     private int total;
+
+    @NonNull
+    @NotEmpty
+    private String address;
+
+    @NonNull
+    private String userEmail;
+
+    @NonNull
+    @NotEmpty
+    private Long phoneNumber;
 
     private List<OrderItem> orderItems= new ArrayList<>();
 

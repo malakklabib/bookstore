@@ -29,6 +29,14 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+    public Users findByShoppingCartId(String shoppingCartId) {
+        return userRepository.findAll().stream().filter(users -> users.getShoppingCart().getShoppingCartId().equals(shoppingCartId)).findFirst().get();
+    }
+
+    public Users findByWishlistId(String wishlistId) {
+        return userRepository.findAll().stream().filter(users -> users.getWishlist().getWishListId().equals(wishlistId)).findFirst().get();
+    }
+
     public Users validate(Authentication auth) throws Exception{
         String email = auth.getName();
         Optional<Users> user = findByEmail(email);

@@ -9,6 +9,7 @@ import java.util.List;
 
 @Document
 @NoArgsConstructor
+@RequiredArgsConstructor
 @ToString
 @Getter
 @Setter
@@ -17,7 +18,8 @@ public class Wishlist {
     @Id
     private String wishListId;
 
-    private List<Book> wishlistItems = new ArrayList<>();
+    @NonNull
+    private List<Book> wishlistItems;
 
     public void addItem(Book b){
         wishlistItems.add(b);

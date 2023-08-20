@@ -23,6 +23,9 @@ public class Review {
     private String bookId;
 
     @NonNull
+    private String userId;
+
+    @NonNull
     @Min(value = 1, message = "minimum rating is 1")
     @Max(value = 5, message = "maximum rating is 5")
     private int rating;

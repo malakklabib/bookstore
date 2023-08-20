@@ -11,10 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,16 +30,16 @@ public class OrderController {
     private final ReviewService reviewService;
 
     @PostMapping("/cart/checkout")
-    public ResponseEntity<Order> proceedToCheckout(Authentication authentication) throws Exception {
+    public ResponseEntity<Order> proceedToCheckout(@RequestParam @NotEmpty String address, @RequestParam @NotEmpty Long phoneNo, Authentication authentication) throws Exception {
         Users u = userService.validate(authentication);
-        Order o = orderService.createOrder(u);
+        Order o = orderService.createOrder(u, address, phoneNo);
         return ResponseEntity.status(HttpStatus.CREATED).body(o);
     }
 
     @GetMapping("/profile/viewOrderHistory")
     public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication) throws Exception{
         Users u = userService.validate(authentication);
-        return ResponseEntity.ok(orderService.findAllByUserId(u.getId()));
+        return ResponseEntity.ok(orderService.findAllByEmail(u.getEmail()));
     }
 
     @GetMapping("/profile/viewOrderHistory/{orderId}")
@@ -47,9 +49,9 @@ public class OrderController {
     }
 
     @PostMapping("/profile/viewOrderHistory/{orderId}/review/{orderItemId}")
-    public ResponseEntity<String> leaveReview(Authentication authentication, @PathVariable String orderId,
+    public ResponseEntity<String> leaveReview(@PathVariable String orderId,
                                               @PathVariable String orderItemId, @RequestParam int rating, @RequestParam String body) throws Exception {
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Users u = userService.validate(authentication);
         Optional<Order> order = orderService.findById(orderId);
 
@@ -70,7 +72,7 @@ public class OrderController {
         if(body.length()>200)
             return ResponseEntity.badRequest().body("review exceeded maximum limit");
 
-        Review newReview = new Review(orderItemId, rating, body);
+        Review newReview = new Review(orderItemId, u.getId(), rating, body);
         reviewService.save(newReview);
 
         Book ratedBook = b.get();

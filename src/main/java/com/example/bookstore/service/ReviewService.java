@@ -1,5 +1,6 @@
 package com.example.bookstore.service;
 
+import com.example.bookstore.domain.Book;
 import com.example.bookstore.domain.Review;
 import com.example.bookstore.repo.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,5 +19,9 @@ public class ReviewService {
 
     public List<Review> findAllByBookId(String bookId) {
         return reviewRepository.findAll().stream().filter(review -> review.getBookId().equals(bookId)).toList();
+    }
+
+    public void deleteAllReviews(Book book) {
+        findAllByBookId(book.getIsbn()).removeIf(review -> review.getBookId().equals(book.getIsbn()));
     }
 }

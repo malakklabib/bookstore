@@ -37,14 +37,9 @@ public class WishlistController {
     }
 
     @PostMapping("{bookId}/addToWishlist")
-    public ResponseEntity<String> addToCart(@PathVariable String bookId, Authentication authentication) {
+    public ResponseEntity<String> addToCart(@PathVariable String bookId, Authentication authentication) throws Exception {
 
-        Users u;
-        try {
-            u = userService.validate(authentication);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        Users u = userService.validate(authentication);
 
         Optional<Book> b = bookService.findById(bookId);
         if (b.isEmpty())
@@ -55,21 +50,15 @@ public class WishlistController {
     }
 
     @DeleteMapping("{bookId}/removeFromWishlist")
-    public ResponseEntity<String> removeFromCart(@PathVariable String bookId, Authentication authentication) {
+    public ResponseEntity<String> removeFromCart(@PathVariable String bookId, Authentication authentication) throws Exception {
 
-        Users u;
-        try {
-            u = userService.validate(authentication);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        Users u = userService.validate(authentication);
 
         Optional<Book> b = bookService.findById(bookId);
         if(b.isEmpty())
             return ResponseEntity.notFound().build();
 
-        wishlistService.removeFromWishlist(u,b.get());
-        return ResponseEntity.ok("Book removed from wishlist.");
+        String mssg = wishlistService.removeFromWishlist(u,b.get());
+        return ResponseEntity.ok(mssg);
     }
 }
