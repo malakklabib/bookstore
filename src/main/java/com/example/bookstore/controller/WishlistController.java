@@ -36,7 +36,7 @@ public class WishlistController {
         }
     }
 
-    @PostMapping("{bookId}/addToWishlist")
+    @PostMapping("books/{bookId}/addToWishlist")
     public ResponseEntity<String> addToCart(@PathVariable String bookId, Authentication authentication) throws Exception {
 
         Users u = userService.validate(authentication);
@@ -49,7 +49,7 @@ public class WishlistController {
         return ResponseEntity.ok("Book added to wishlist.");
     }
 
-    @DeleteMapping("{bookId}/removeFromWishlist")
+    @DeleteMapping("wishlist/{bookId}/removeFromWishlist")
     public ResponseEntity<String> removeFromCart(@PathVariable String bookId, Authentication authentication) throws Exception {
 
         Users u = userService.validate(authentication);

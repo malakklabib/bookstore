@@ -36,7 +36,7 @@ public class ShoppingCartController {
         return ResponseEntity.ok(cart.get().getShoppingCartItems());
     }
 
-    @PostMapping("{bookId}/addToCart")
+    @PostMapping("/books/{bookId}/addToCart")
     public ResponseEntity<String> addToCart(@PathVariable String bookId) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Users u = userService.validate(authentication);
@@ -49,7 +49,7 @@ public class ShoppingCartController {
         return ResponseEntity.ok("Book added to cart.");
     }
 
-    @DeleteMapping("{bookId}/removeFromCart")
+    @DeleteMapping("cart/{bookId}/removeFromCart")
     public ResponseEntity<String> removeFromCart(@PathVariable String bookId) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -13,20 +13,17 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/books/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
+    private final UserService userService;
     private final BookService bookService;
     private final OrderService orderService;
+    private final MailService mailService;
     private final ShoppingCartService shoppingCartService;
     private final WishlistService wishlistService;
     private final ReviewService reviewService;
-
-    @GetMapping("")
-    public ResponseEntity<List<Book>> manageBooks(){
-        return ResponseEntity.ok(bookService.findAll());
-    }
 
     @PostMapping("/addBook")
     public ResponseEntity<Book> createBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
@@ -87,7 +84,17 @@ public class AdminController {
         Optional<Order> o = orderService.findById(orderId);
         if(o.isEmpty())
             return ResponseEntity.notFound().build();
-        Status s = o.get().getStatus() == Status.PLACED? Status.SHIPPING : Status.DELIVERED;
+
+        Order order = o.get();
+        Status s = order.getStatus();
+        Users user = userService.findByEmail(order.getUserEmail()).get();
+
+        if(s == Status.PLACED){
+            s = Status.SHIPPING;
+            mailService.sendShipmentEmail(user, order);
+        }
+        else s = Status.DELIVERED;
+
         o.get().setStatus(s);
         orderService.save(o.get());
         return ResponseEntity.ok().build();

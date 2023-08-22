@@ -13,6 +13,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
 
     public Users save(Users user){
@@ -46,6 +47,8 @@ public class UserService {
         }
         return user.get();
     }
+
+
 //    public Users register(Users user) {
 //        String secret = "{bcrypt}" + encoder.encode(user.getPassword());
 //        user.setPassword(secret);

@@ -4,6 +4,7 @@ import com.example.bookstore.domain.validator.PasswordsMatch;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -46,12 +47,15 @@ public class Users implements UserDetails {
     private String email;
 
     @NonNull
+    @DBRef
     private ShoppingCart shoppingCart;
 
     @NonNull
+    @DBRef
     private Wishlist wishlist;
 
     @NonNull
+    @DBRef
     private Role role;
 
     @Override

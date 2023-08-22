@@ -2,6 +2,7 @@ package com.example.bookstore.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
@@ -36,6 +37,7 @@ public class Order {
     @NotEmpty
     private Long phoneNumber;
 
+    @DBRef
     private List<OrderItem> orderItems= new ArrayList<>();
 
     public Optional<OrderItem> findOrderItem(String orderItemId){

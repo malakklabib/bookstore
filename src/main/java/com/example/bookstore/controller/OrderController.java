@@ -3,10 +3,7 @@ package com.example.bookstore.controller;
 
 import com.example.bookstore.domain.*;
 import com.example.bookstore.repo.ReviewRepository;
-import com.example.bookstore.service.BookService;
-import com.example.bookstore.service.OrderService;
-import com.example.bookstore.service.ReviewService;
-import com.example.bookstore.service.UserService;
+import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,27 +25,29 @@ public class OrderController {
     private final OrderService orderService;
     private final BookService bookService;
     private final ReviewService reviewService;
+    private final MailService mailService;
 
     @PostMapping("/cart/checkout")
     public ResponseEntity<Order> proceedToCheckout(@RequestParam @NotEmpty String address, @RequestParam @NotEmpty Long phoneNo, Authentication authentication) throws Exception {
         Users u = userService.validate(authentication);
         Order o = orderService.createOrder(u, address, phoneNo);
+        mailService.sendConfirmationEmail(u, o);
         return ResponseEntity.status(HttpStatus.CREATED).body(o);
     }
 
-    @GetMapping("/profile/viewOrderHistory")
+    @GetMapping("/viewOrderHistory")
     public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication) throws Exception{
         Users u = userService.validate(authentication);
         return ResponseEntity.ok(orderService.findAllByEmail(u.getEmail()));
     }
 
-    @GetMapping("/profile/viewOrderHistory/{orderId}")
+    @GetMapping("/viewOrderHistory/{orderId}")
     public ResponseEntity<Order> trackOrder(@PathVariable String orderId){
         Optional<Order> o = orderService.findById(orderId);
         return o.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/profile/viewOrderHistory/{orderId}/review/{orderItemId}")
+    @PostMapping("/viewOrderHistory/{orderId}/review/{orderItemId}")
     public ResponseEntity<String> leaveReview(@PathVariable String orderId,
                                               @PathVariable String orderItemId, @RequestParam int rating, @RequestParam String body) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

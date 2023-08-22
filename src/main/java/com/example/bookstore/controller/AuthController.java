@@ -2,10 +2,7 @@ package com.example.bookstore.controller;
 
 import com.example.bookstore.domain.*;
 import com.example.bookstore.security.JwtUtil;
-import com.example.bookstore.service.RoleService;
-import com.example.bookstore.service.ShoppingCartService;
-import com.example.bookstore.service.UserService;
-import com.example.bookstore.service.WishlistService;
+import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +34,7 @@ public class AuthController {
     private final RoleService roleService;
     private final WishlistService wishlistService;
     private final ShoppingCartService shoppingCartService;
+    private final MailService mailService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
@@ -99,6 +97,9 @@ public class AuthController {
         shoppingCartService.save(sc);
         wishlistService.save(ws);
         userService.save(newUser);
+
+        mailService.sendWelcomeEmail(newUser);
+
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
