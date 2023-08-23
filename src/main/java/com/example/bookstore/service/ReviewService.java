@@ -22,6 +22,10 @@ public class ReviewService {
     }
 
     public void deleteAllReviews(Book book) {
+        if(isEmpty())
+            return;
         findAllByBookId(book.getIsbn()).removeIf(review -> review.getBookId().equals(book.getIsbn()));
     }
+
+    public boolean isEmpty(){ return reviewRepository.findAll().isEmpty(); }
 }

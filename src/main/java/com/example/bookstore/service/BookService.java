@@ -1,6 +1,10 @@
 package com.example.bookstore.service;
 
+import com.example.bookstore.domain.Order;
+import com.example.bookstore.domain.OrderItem;
+import com.example.bookstore.domain.Users;
 import com.example.bookstore.repo.BookRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -10,21 +14,14 @@ import org.springframework.stereotype.Service;
 
 import com.example.bookstore.domain.Book;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepository;
-
-    private final Logger logger = LoggerFactory.getLogger(BookService.class);
-
-
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+    private final OrderService orderService;
 
     public List<Book> findAll(){
         return bookRepository.findAll();
@@ -42,8 +39,8 @@ public class BookService {
         bookRepository.delete(book);
     }
 
-    public List<Book> findByParameters(Optional<String> title, Optional<String> author, Optional<Integer> priceMin,
-                                       Optional<Integer> priceMax, Optional<Date> dateMin, Optional<Date> dateMax, Optional<Integer> avgRating) {
+    public List<Book> findByParameters(Optional<String> title, Optional<String> author, Optional<Double> priceMin,
+                                       Optional<Double> priceMax, Optional<Date> dateMin, Optional<Date> dateMax, Optional<Double> avgRating) {
         List<Book> res = findAll();
 
         if (title.isPresent())
@@ -81,4 +78,36 @@ public class BookService {
     public Page<Book> getBooksByPage(Pageable p) {
         return bookRepository.findAll(p);
     }
+
+    public String getRecommendedBooks(String category) {
+        String s = "";
+        List<String> books = bookRepository.findTop5ByCategoryOrderByAvgRatingDesc(category).stream().map(Book::getTitle).toList();
+
+        for(String b : books){
+            if(books.indexOf(b)== books.size()-1)
+                s += b;
+            else
+                s += b + ", ";
+        }
+        return s;
+    }
+
+    public String findMostCommonCategory(Users user) {
+        List <Order> orders = orderService.findTop3ByEmail(user.getEmail());
+        List<String> books = new ArrayList<>();
+
+        for(Order order : orders){
+            for(OrderItem orderItem : order.getOrderItems()){
+                Optional<Book> b = findById(orderItem.getIsbn());
+                if(b.isEmpty())
+                    continue;
+                books.add(b.get().getCategory());
+            }
+        }
+        List<Book> mostCommonCategory = bookRepository.findAllByIsbnInOrderByCategoryDesc(books);
+        if(!mostCommonCategory.isEmpty())
+            return bookRepository.findAllByIsbnInOrderByCategoryDesc(books).get(0).getCategory();
+        return "";
+    }
+
 }

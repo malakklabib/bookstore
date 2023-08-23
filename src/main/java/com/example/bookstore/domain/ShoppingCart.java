@@ -14,7 +14,7 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class ShoppingCart {
+public class ShoppingCart{
 
     @Id
     private String shoppingCartId;
@@ -24,9 +24,8 @@ public class ShoppingCart {
     private List<Book> shoppingCartItems;
 
 
-    public ShoppingCart reset(){
-        shoppingCartItems = new ArrayList<>();
-        return this;
+    public void reset(){
+        shoppingCartItems.clear();
     }
 
     public void addItem(Book b){
@@ -36,5 +35,6 @@ public class ShoppingCart {
     public void removeItem(Book b){
         shoppingCartItems.remove(b);
     }
+
 
 }

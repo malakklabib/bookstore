@@ -5,6 +5,7 @@ import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/books/admin")
+@RequestMapping("/books")
+@Secured("ROLE_ADMIN")
 @RequiredArgsConstructor
 public class AdminController {
 
@@ -21,8 +23,6 @@ public class AdminController {
     private final BookService bookService;
     private final OrderService orderService;
     private final MailService mailService;
-    private final ShoppingCartService shoppingCartService;
-    private final WishlistService wishlistService;
     private final ReviewService reviewService;
 
     @PostMapping("/addBook")
@@ -51,9 +51,6 @@ public class AdminController {
         updatedBook.setIsbn(id);
         Book savedBook = bookService.save(updatedBook);
 
-        shoppingCartService.updateShoppingCarts(existingBook.get(), updatedBook);
-        wishlistService.updateWishLists(existingBook.get(), updatedBook);
-
         return ResponseEntity.ok(savedBook);
     }
 
@@ -66,9 +63,6 @@ public class AdminController {
             return ResponseEntity.notFound().build();
 
         bookService.delete(b.get());
-
-        shoppingCartService.deleteFromShoppingCarts(b.get());
-        wishlistService.deleteFromWishlists(b.get());
         reviewService.deleteAllReviews(b.get());
 
         return ResponseEntity.noContent().build();

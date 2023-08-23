@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,6 +47,10 @@ public class UserService {
             throw new Exception("user not authorized");
         }
         return user.get();
+    }
+
+    public List<Users> findAll() {
+        return userRepository.findAll();
     }
 
 

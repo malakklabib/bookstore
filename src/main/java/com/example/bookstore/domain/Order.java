@@ -24,17 +24,15 @@ public class Order {
     private Status status;
 
     @NonNull
-    private int total;
+    private double total;
 
     @NonNull
-    @NotEmpty
     private String address;
 
     @NonNull
     private String userEmail;
 
     @NonNull
-    @NotEmpty
     private Long phoneNumber;
 
     @DBRef

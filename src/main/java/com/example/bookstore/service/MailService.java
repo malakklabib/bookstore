@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -22,7 +23,8 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class MailService {
 
-    private final OrderService orderService;
+    private final UserService userService;
+    private final BookService bookService;
 
     private final Logger log = LoggerFactory.getLogger(MailService.class);
     private final SpringTemplateEngine templateEngine;
@@ -40,7 +42,7 @@ public class MailService {
             message.setTo(to);
             message.setFrom("noreply@springit.com");
             message.setSubject(subject);
-            message.setText(content,isHtml);
+            message.setText(content, isHtml);
             javaMailSender.send(mimeMessage);
         } catch (Exception e) {
             log.warn("Email could not be sent to user '{}': {}", to, e.getMessage());
@@ -52,39 +54,49 @@ public class MailService {
         Locale locale = Locale.ENGLISH;
         Context context = new Context(locale);
         context.setVariable("user", users);
-        context.setVariable("baseURL",BASE_URL);
-        String content = templateEngine.process(templateName,context);
-        sendEmail(users.getEmail(),subject,content,false,true);
+        context.setVariable("baseURL", BASE_URL);
+        String content = templateEngine.process(templateName, context);
+        sendEmail(users.getEmail(), subject, content, false, true);
     }
 
     @Async
     public void sendWelcomeEmail(Users users) {
         log.debug("Sending activation email to '{}'", users.getEmail());
-        sendEmailFromTemplate(users, "email/welcome", "Welcome, "+users.getName()+"!");
+        sendEmailFromTemplate(users, "email/welcome", "Welcome, " + users.getName() + "!");
     }
 
     @Async
     public void sendConfirmationEmail(Users user, Order order) {
         log.debug("Sending activation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, "email/welcome", "Order #"+order.getId()+" is confirmed!");
+        sendEmailFromTemplate(user, "email/welcome", "Order #" + order.getId() + " is confirmed!");
     }
 
     @Async
     public void sendShipmentEmail(Users user, Order order) {
         log.debug("Sending activation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, "email/welcome", "Order #"+order.getId()+" is shipped!");
+        sendEmailFromTemplate(user, "email/welcome", "Order #" + order.getId() + " is shipped!");
     }
 
-    @Scheduled(fixedRate = 2 * 60 * 100000)
-    public void sendMostCommonOrderItemEmail() {
-        List<OrderItem> mostCommonOrderItem = orderService.findMostCommonOrderItem();
+    @Scheduled(fixedRate = 60 * 1000) //1 day = 1440 mins
+    public void sendMostCommonCategoryEmail() {
 
-        if (!mostCommonOrderItem.isEmpty()) {
-            String userEmail = "admin@gmail.com";
-            String subject = "Your Most Common Order Item";
-            String text = "Your most common order item is: " + mostCommonOrderItem.get(0).toString();
+        List<Users> users = userService.findAll();
 
-            sendEmail(userEmail, subject, text,false,true);
+        for (Users u : users) {
+
+            String mostCommonCategory = bookService.findMostCommonCategory(u);
+            if (mostCommonCategory.isEmpty())
+                return;
+
+            String recBooks = bookService.getRecommendedBooks(mostCommonCategory);
+            if (recBooks.isEmpty())
+                return;
+
+            String userEmail = u.getEmail();
+            String subject = "Your top genre is " + mostCommonCategory + "!";
+            String text = "Your daily recommendations are: " + recBooks;
+            sendEmail(userEmail, subject, text, false, true);
+
         }
     }
 

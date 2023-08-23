@@ -28,7 +28,7 @@ public class Review {
     @NonNull
     @Min(value = 1, message = "minimum rating is 1")
     @Max(value = 5, message = "maximum rating is 5")
-    private int rating;
+    private double rating;
 
     @NonNull
     @Size(max = 200, message = "maximum limit exceeded")

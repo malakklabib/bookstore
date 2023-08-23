@@ -26,13 +26,13 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping("")
-    public ResponseEntity<Page<Book>> catalog(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size, @RequestParam(required = false) Optional<String> sort) {
+    public ResponseEntity<List<Book>> catalog(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size, @RequestParam(required = false) Optional<String> sort) {
         Page<Book> books;
         if(sort.isPresent())
-             books = bookService.getBooksByPage(PageRequest.of(page, size, Sort.by(sort.get())));
+            books = bookService.getBooksByPage(PageRequest.of(page, size, Sort.by(sort.get())));
         else
             books = bookService.getBooksByPage(PageRequest.of(page, size));
-        return ResponseEntity.ok(books);
+        return ResponseEntity.ok(books.stream().toList());
     }
 
     @GetMapping("/{bookId}")
@@ -45,9 +45,9 @@ public class BookController {
 
     @PostMapping("/search")
     public ResponseEntity<List<Book>> search(@RequestParam(required = false) Optional<String> title, @RequestParam(required = false) Optional<String> author,
-                                             @RequestParam(required = false) Optional<Integer> priceMin, @RequestParam(required = false) Optional<Integer> priceMax,
+                                             @RequestParam(required = false) Optional<Double> priceMin, @RequestParam(required = false) Optional<Double> priceMax,
                                              @RequestParam(required = false) Optional<Date> dateMin, @RequestParam(required = false) Optional<Date> dateMax,
-                                             @RequestParam(required = false) Optional<Integer> avgRating){
+                                             @RequestParam(required = false) Optional<Double> avgRating){
         List<Book> res = bookService.findByParameters(title, author, priceMin, priceMax, dateMin, dateMax, avgRating);
         if(res.isEmpty())
             return ResponseEntity.notFound().build();

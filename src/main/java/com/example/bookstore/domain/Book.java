@@ -20,7 +20,7 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class Book {
+public class Book{
 
     @Id
     String isbn;
@@ -38,19 +38,20 @@ public class Book {
     @NonNull
     @Min(value = 1, message = "please add an appropriate price")
     @Max(value = 100, message = "please add an appropriate price")
-    int price;
+    double price;
+
+    @NonNull
+    private String category;
 
     @NonNull
     private Date publicationDate;
 
     @NonNull
-    private int avgRating;
+    private double avgRating;
 
     public boolean equals(Object o){
         if(o instanceof Book)
             return this.isbn.equals(((Book)o).isbn);
         return false;
     }
-
-
 }

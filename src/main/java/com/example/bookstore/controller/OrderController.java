@@ -2,17 +2,14 @@ package com.example.bookstore.controller;
 
 
 import com.example.bookstore.domain.*;
-import com.example.bookstore.repo.ReviewRepository;
 import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Optional;
@@ -28,21 +25,24 @@ public class OrderController {
     private final MailService mailService;
 
     @PostMapping("/cart/checkout")
-    public ResponseEntity<Order> proceedToCheckout(@RequestParam @NotEmpty String address, @RequestParam @NotEmpty Long phoneNo, Authentication authentication) throws Exception {
+    public ResponseEntity<Order> proceedToCheckout(@RequestParam @NotEmpty String address, @RequestParam @NotEmpty Long phoneNo,
+                                                   Authentication authentication) throws Exception {
         Users u = userService.validate(authentication);
+        if (u.getShoppingCart().getShoppingCartItems().isEmpty())
+            return ResponseEntity.badRequest().build();
         Order o = orderService.createOrder(u, address, phoneNo);
         mailService.sendConfirmationEmail(u, o);
         return ResponseEntity.status(HttpStatus.CREATED).body(o);
     }
 
     @GetMapping("/viewOrderHistory")
-    public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication) throws Exception{
+    public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication) throws Exception {
         Users u = userService.validate(authentication);
         return ResponseEntity.ok(orderService.findAllByEmail(u.getEmail()));
     }
 
     @GetMapping("/viewOrderHistory/{orderId}")
-    public ResponseEntity<Order> trackOrder(@PathVariable String orderId){
+    public ResponseEntity<Order> trackOrder(@PathVariable String orderId) {
         Optional<Order> o = orderService.findById(orderId);
         return o.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -54,21 +54,21 @@ public class OrderController {
         Users u = userService.validate(authentication);
         Optional<Order> order = orderService.findById(orderId);
 
-        if(order.isEmpty())
+        if (order.isEmpty())
             return ResponseEntity.notFound().build();
 
         Optional<OrderItem> item = order.get().findOrderItem(orderItemId);
 
-        if(item.isEmpty())
+        if (item.isEmpty())
             return ResponseEntity.notFound().build();
 
         Optional<Book> b = bookService.findById(orderItemId);
-        if(b.isEmpty())
+        if (b.isEmpty())
             return ResponseEntity.notFound().build();
 
-        if(rating<1 || rating>5)
+        if (rating < 1 || rating > 5)
             return ResponseEntity.badRequest().body("rating should lie between 1 and 5 stars");
-        if(body.length()>200)
+        if (body.length() > 200)
             return ResponseEntity.badRequest().body("review exceeded maximum limit");
 
         Review newReview = new Review(orderItemId, u.getId(), rating, body);
@@ -78,12 +78,12 @@ public class OrderController {
         List<Review> reviews = reviewService.findAllByBookId(orderItemId);
         int count = 0;
         int ratings = 0;
-        for(Review review : reviews){
+        for (Review review : reviews) {
             count++;
-            ratings+= review.getRating();
+            ratings += review.getRating();
         }
 
-        ratedBook.setAvgRating(ratings/count);
+        ratedBook.setAvgRating(ratings / count);
         bookService.save(ratedBook);
         return ResponseEntity.ok("your response has been submitted!");
     }
