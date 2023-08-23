@@ -7,6 +7,7 @@ import com.example.bookstore.service.BookService;
 import com.example.bookstore.service.ShoppingCartService;
 import com.example.bookstore.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,7 +50,7 @@ public class ShoppingCartController {
         return ResponseEntity.ok("Book added to cart.");
     }
 
-    @DeleteMapping("cart/{bookId}/removeFromCart")
+    @DeleteMapping("/cart/{bookId}/removeFromCart")
     public ResponseEntity<String> removeFromCart(@PathVariable String bookId) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

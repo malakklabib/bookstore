@@ -1,7 +1,6 @@
 package com.example.bookstore.service;
 
 import com.example.bookstore.domain.Order;
-import com.example.bookstore.domain.OrderItem;
 import com.example.bookstore.domain.Users;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -77,7 +75,7 @@ public class MailService {
         sendEmailFromTemplate(user, "email/welcome", "Order #" + order.getId() + " is shipped!");
     }
 
-    @Scheduled(fixedRate = 60 * 1000) //1 day = 1440 mins
+    @Scheduled(fixedRate = 60 * 1000) // 1 day = 1440 mins
     public void sendMostCommonCategoryEmail() {
 
         List<Users> users = userService.findAll();
