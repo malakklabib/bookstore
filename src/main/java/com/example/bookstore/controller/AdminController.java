@@ -3,6 +3,8 @@ package com.example.bookstore.controller;
 import com.example.bookstore.domain.*;
 import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -25,11 +27,15 @@ public class AdminController {
     private final MailService mailService;
     private final ReviewService reviewService;
 
-    @PostMapping("/addBook")
-    public ResponseEntity<Book> createBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+    @PostMapping("/addBook")
+    public ResponseEntity<?> createBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()){
+            String s = "";
+            for(int i = 0 ; i < bindingResult.getErrorCount(); i++)
+                s+=bindingResult.getAllErrors().get(i).getDefaultMessage() + "\n";
+            return ResponseEntity.badRequest().body(s);
         }
 
         Book savedBook = bookService.save(book);
@@ -37,15 +43,17 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable String id, @RequestBody @Valid Book updatedBook, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody @Valid Book updatedBook, BindingResult bindingResult) {
 
         Optional<Book> existingBook = bookService.findById(id);
-        if (existingBook.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (existingBook.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found.");
+
+        if(bindingResult.hasErrors()){
+            String s = "";
+            for(int i = 0 ; i < bindingResult.getErrorCount(); i++)
+                s+=bindingResult.getAllErrors().get(i).getDefaultMessage() + "\n";
+            return ResponseEntity.badRequest().body(s);
         }
 
         updatedBook.setIsbn(id);
@@ -55,17 +63,16 @@ public class AdminController {
     }
 
     @DeleteMapping ("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable String id){
+    public ResponseEntity<?> deleteBook(@PathVariable String id){
 
-        Optional<Book> b = bookService.findById(id);
+        Optional<Book> existingBook = bookService.findById(id);
+        if (existingBook.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found.");
 
-        if (b.isEmpty())
-            return ResponseEntity.notFound().build();
+        bookService.delete(existingBook.get());
+        reviewService.deleteAllReviews(existingBook.get());
 
-        bookService.delete(b.get());
-        reviewService.deleteAllReviews(b.get());
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Book successfully deleted.");
     }
 
     @GetMapping("/updateTracking")
@@ -74,24 +81,29 @@ public class AdminController {
     }
 
     @PutMapping("/updateTracking/{orderId}")
-    public ResponseEntity<Void> updateTracking(@PathVariable String orderId){
+    public ResponseEntity<?> updateTracking(@PathVariable String orderId){
         Optional<Order> o = orderService.findById(orderId);
         if(o.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found.");
 
         Order order = o.get();
-        Status s = order.getStatus();
-        Users user = userService.findByEmail(order.getUserEmail()).get();
 
-        if(s == Status.PLACED){
-            s = Status.SHIPPING;
+        String userEmail = order.getUserEmail();
+        Optional<Users> u = userService.findByEmail(userEmail);
+        if(u.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+
+        Users user = u.get();
+        Status orderStatus = order.getStatus();
+        if(orderStatus == Status.PLACED){
+            orderStatus = Status.SHIPPING;
             mailService.sendShipmentEmail(user, order);
         }
-        else s = Status.DELIVERED;
+        else orderStatus = Status.DELIVERED;
 
-        o.get().setStatus(s);
-        orderService.save(o.get());
-        return ResponseEntity.ok().build();
+        order.setStatus(orderStatus);
+        orderService.save(order);
+        return ResponseEntity.ok().body(order);
     }
 
 }

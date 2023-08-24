@@ -26,21 +26,19 @@ public class Book{
     String isbn;
 
     @NonNull
-    @Size(min = 1, max = 100)
-    @NotEmpty(message = "please add the book's title")
+    @NotEmpty(message = "Please add the book's title.")
     String title;
 
     @NonNull
-    @Size(min = 1, max = 100)
-    @NotEmpty(message = "please add the book's author")
+    @NotEmpty(message = "Please add the book's author.")
     String author;
 
     @NonNull
-    @Min(value = 1, message = "please add an appropriate price")
-    @Max(value = 100, message = "please add an appropriate price")
+    @Min(value = 1, message = "Please add an appropriate price.")
     double price;
 
     @NonNull
+    @NotEmpty(message = "Please add the book's category.")
     private String category;
 
     @NonNull
