@@ -45,8 +45,8 @@ public class WishlistController {
         if (b.isEmpty())
             return ResponseEntity.notFound().build();
 
-        wishlistService.addToWishlist(u, b.get());
-        return ResponseEntity.ok("Book added to wishlist.");
+        String mssg = wishlistService.addToWishlist(u, b.get());
+        return ResponseEntity.ok(mssg);
     }
 
     @DeleteMapping("wishlist/{bookId}/removeFromWishlist")

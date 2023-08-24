@@ -28,22 +28,22 @@ public class Users implements UserDetails {
     private String id;
 
     @NonNull
-    @Size(min = 4, max = 50, message = "Please enter your full name")
-    @NotEmpty(message = "Please enter your full name")
+    @Size(min = 4, max = 50, message = "Please enter your full name.")
+    @NotEmpty(message = "Please enter your full name.")
     private String name;
 
     @NonNull
-    @Size(min = 8, max = 20, message = "Please enter a password between 8 and 20 characters")
-    @NotEmpty(message = "Please enter a password")
+    @Size(min = 8, max = 20, message = "Please enter a password between 8 and 20 characters.")
+    @NotEmpty(message = "Please enter a password.")
     private String password;
 
     @Transient
-    @NotEmpty(message = "Please confirm your password")
+    @NotEmpty(message = "Please confirm your password.")
     private String confirmPassword;
 
     @NonNull
-    @Size(min = 10, max = 25, message = "Please enter a valid email")
-    @NotEmpty(message = "Please enter your email")
+    @Size(min = 10, max = 25, message = "Please enter a valid email.")
+    @NotEmpty(message = "Please enter your email.")
     private String email;
 
     @NonNull

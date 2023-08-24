@@ -26,7 +26,7 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping("")
-    public ResponseEntity<List<Book>> catalog(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size, @RequestParam(required = false) Optional<String> sort) {
+    public ResponseEntity<List<Book>> catalog(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(required = false) Optional<String> sort) {
         Page<Book> books;
         if(sort.isPresent())
             books = bookService.getBooksByPage(PageRequest.of(page, size, Sort.by(sort.get())));

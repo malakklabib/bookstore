@@ -9,13 +9,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/books")
-@Secured("ROLE_ADMIN")
+@RequestMapping("/books/admin")
 @RequiredArgsConstructor
 public class AdminController {
 

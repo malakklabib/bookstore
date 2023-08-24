@@ -15,23 +15,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ShoppingCartService {
 
-    private final UserService userService;
     private final ShoppingCartRepository shoppingCartRepository;
 
     public void addToCart(Users u, Book b){
         ShoppingCart shoppingCart = u.getShoppingCart();
         shoppingCart.addItem(b);
-        u.setShoppingCart(shoppingCart);
         save(shoppingCart);
-        userService.save(u);
     }
 
     public void removeFromCart(Users u, Book b) {
         ShoppingCart shoppingCart = u.getShoppingCart();
         shoppingCart.removeItem(b);
-        u.setShoppingCart(shoppingCart);
         save(shoppingCart);
-        userService.save(u);
     }
 
     public ShoppingCart save(ShoppingCart shoppingCart) {

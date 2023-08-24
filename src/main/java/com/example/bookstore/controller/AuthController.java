@@ -4,8 +4,11 @@ import com.example.bookstore.domain.*;
 import com.example.bookstore.security.JwtUtil;
 import com.example.bookstore.service.*;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,10 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,76 +31,63 @@ import java.util.ArrayList;
 public class AuthController {
 
     private final UserService userService;
-    private final RoleService roleService;
-    private final WishlistService wishlistService;
-    private final ShoppingCartService shoppingCartService;
     private final MailService mailService;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
 
 
     @GetMapping("/u")
-    public ResponseEntity<String> user(Authentication a) {
-        return ResponseEntity.ok(a.getName());
+    public ResponseEntity<String> user() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(auth.getName());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> loginUser(@RequestBody AuthenticationRequest authenticationRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody AuthenticationRequest authenticationRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
             );
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No account is associated with these credentials.");
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String jwt = jwtUtil.generateToken(userDetails);
-
-//        String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("ROLE_USER");
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
 
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
-        String token = jwtUtil.extractTokenFromHeader(request.getHeader("Authorization"));
+    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = jwtUtil.extractTokenFromHeader(authorizationHeader);
+        if(jwtUtil.isInvalid(token))
+            return ResponseEntity.badRequest().body("You're not logged in.");
         jwtUtil.invalidateToken(token);
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok("You've logged out successfully!");
+        return ResponseEntity.ok("You've logged out successfully.");
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Users> registerNewUser(@RequestBody @Valid Users user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors() || userService.findByEmail(user.getEmail()).isPresent())
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> registerNewUser(@RequestBody @Valid Users user, BindingResult bindingResult) {
 
-        ShoppingCart sc = new ShoppingCart(new ArrayList<>());
-        Wishlist ws = new Wishlist(new ArrayList<>());
-        Role role = roleService.findByName("ROLE_USER");
-        String secret = encoder.encode(user.getPassword());
+        if(bindingResult.hasErrors()){
+            String s = "";
+            for(int i = 0 ; i < bindingResult.getErrorCount(); i++)
+                s+=bindingResult.getAllErrors().get(i).getDefaultMessage() + "\n";
+            return ResponseEntity.badRequest().body(s);
+        }
 
-        Users newUser = new Users();
+        if (userService.findByEmail(user.getEmail()).isPresent())
+            return ResponseEntity.badRequest().body("Credentials are invalid.");
 
-        newUser.setRole(role);
-        newUser.setName(user.getName());
-        newUser.setEmail(user.getEmail());
-        newUser.setPassword(secret);
-        newUser.setConfirmPassword(secret);
-        newUser.setWishlist(ws);
-        newUser.setShoppingCart(sc);
-
-        shoppingCartService.save(sc);
-        wishlistService.save(ws);
-        userService.save(newUser);
+        Users newUser = userService.register(user);
 
         mailService.sendWelcomeEmail(newUser);
 
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body("You've registered successfully!");
     }
 
 }
