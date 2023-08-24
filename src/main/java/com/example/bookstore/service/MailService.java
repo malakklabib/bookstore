@@ -27,11 +27,10 @@ public class MailService {
     private final Logger log = LoggerFactory.getLogger(MailService.class);
     private final SpringTemplateEngine templateEngine;
     private final JavaMailSender javaMailSender;
-    private final String BASE_URL = "http://localhost:8080";
 
 
     @Async
-    public void sendEmail(String to, String subject, String content, boolean isMultiPart, boolean isHtml) {
+    public void sendEmail(String to, String subject, String content, boolean isHtml) {
         log.debug("Sending Email");
 
         MimeMessage mimeMessage = this.javaMailSender.createMimeMessage();
@@ -52,30 +51,28 @@ public class MailService {
         Locale locale = Locale.ENGLISH;
         Context context = new Context(locale);
         context.setVariable("user", users);
+        String BASE_URL = "http://localhost:8080";
         context.setVariable("baseURL", BASE_URL);
         String content = templateEngine.process(templateName, context);
-        sendEmail(users.getEmail(), subject, content, false, true);
+        sendEmail(users.getEmail(), subject, content, true);
     }
 
     @Async
     public void sendWelcomeEmail(Users users) {
-        log.debug("Sending activation email to '{}'", users.getEmail());
         sendEmailFromTemplate(users, "email/welcome", "Welcome, " + users.getName() + "!");
     }
 
     @Async
     public void sendConfirmationEmail(Users user, Order order) {
-        log.debug("Sending activation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "email/welcome", "Order #" + order.getId() + " is confirmed!");
     }
 
     @Async
     public void sendShipmentEmail(Users user, Order order) {
-        log.debug("Sending activation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "email/welcome", "Order #" + order.getId() + " is shipped!");
     }
 
-    @Scheduled(fixedRate = 60 * 1000) // 1 day = 1440 mins
+    @Scheduled(fixedRate = 1440 * 60 * 1000) // 1 day = 1440 mins (time in milliseconds)
     public void sendMostCommonCategoryEmail() {
 
         List<Users> users = userService.findAll();
@@ -93,7 +90,7 @@ public class MailService {
             String userEmail = u.getEmail();
             String subject = "Your top genre is " + mostCommonCategory + "!";
             String text = "Your daily recommendations are: " + recBooks;
-            sendEmail(userEmail, subject, text, false, true);
+            sendEmail(userEmail, subject, text, true);
 
         }
     }

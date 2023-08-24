@@ -25,7 +25,7 @@ public class OrderController {
     private final MailService mailService;
 
     @PostMapping("/cart/checkout")
-    public ResponseEntity<Order> proceedToCheckout(@RequestParam @NotEmpty String address, @RequestParam @NotEmpty Long phoneNo,
+    public ResponseEntity<Order> proceedToCheckout(@RequestParam String address, @RequestParam Long phoneNo,
                                                    Authentication authentication) throws Exception {
         Users u = userService.validate(authentication);
         if (u.getShoppingCart().getShoppingCartItems().isEmpty())
@@ -35,21 +35,21 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(o);
     }
 
-    @GetMapping("/viewOrderHistory")
+    @GetMapping("/profile/viewOrderHistory")
     public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication) throws Exception {
         Users u = userService.validate(authentication);
         return ResponseEntity.ok(orderService.findAllByEmail(u.getEmail()));
     }
 
-    @GetMapping("/viewOrderHistory/{orderId}")
+    @GetMapping("/profile/viewOrderHistory/{orderId}")
     public ResponseEntity<Order> trackOrder(@PathVariable String orderId) {
         Optional<Order> o = orderService.findById(orderId);
         return o.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/viewOrderHistory/{orderId}/review/{orderItemId}")
-    public ResponseEntity<String> leaveReview(@PathVariable String orderId,
-                                              @PathVariable String orderItemId, @RequestParam int rating, @RequestParam String body) throws Exception {
+    @PostMapping("/profile/viewOrderHistory/{orderId}/review/{orderItemId}")
+    public ResponseEntity<String> leaveReview(@PathVariable String orderId, @PathVariable String orderItemId,
+                                              @RequestParam int rating, @RequestParam String body) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Users u = userService.validate(authentication);
         Optional<Order> order = orderService.findById(orderId);
@@ -77,7 +77,7 @@ public class OrderController {
         Book ratedBook = b.get();
         List<Review> reviews = reviewService.findAllByBookId(orderItemId);
         int count = 0;
-        int ratings = 0;
+        double ratings = 0;
         for (Review review : reviews) {
             count++;
             ratings += review.getRating();
