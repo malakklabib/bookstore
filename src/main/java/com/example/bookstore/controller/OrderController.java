@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,19 +24,19 @@ public class OrderController {
     private final MailService mailService;
 
     @PostMapping("/cart/checkout")
-    public ResponseEntity<Order> proceedToCheckout(@RequestParam String address, @RequestParam Long phoneNo,
-                                                   Authentication authentication) throws Exception {
-        Users u = userService.validate(authentication);
-        if (u.getShoppingCart().getShoppingCartItems().isEmpty())
-            return ResponseEntity.badRequest().build();
-        Order o = orderService.createOrder(u, address, phoneNo);
-        mailService.sendConfirmationEmail(u, o);
-        return ResponseEntity.status(HttpStatus.CREATED).body(o);
+    public ResponseEntity<?> proceedToCheckout(@RequestParam String address, @RequestParam Long phoneNo,
+                                                   Authentication authentication){
+        Users user = userService.getUser(authentication);
+        if (user.getShoppingCart().getShoppingCartItems().isEmpty())
+            return ResponseEntity.ok("Your shopping cart is empty.");
+        Order order = orderService.createOrder(user, address, phoneNo);
+        mailService.sendConfirmationEmail(user, order);
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
     @GetMapping("/profile/viewOrderHistory")
-    public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication) throws Exception {
-        Users u = userService.validate(authentication);
+    public ResponseEntity<List<Order>> viewAllOrders(Authentication authentication){
+        Users u = userService.getUser(authentication);
         return ResponseEntity.ok(orderService.findAllByEmail(u.getEmail()));
     }
 
@@ -49,9 +48,9 @@ public class OrderController {
 
     @PostMapping("/profile/viewOrderHistory/{orderId}/review/{orderItemId}")
     public ResponseEntity<String> leaveReview(@PathVariable String orderId, @PathVariable String orderItemId,
-                                              @RequestParam int rating, @RequestParam String body) throws Exception {
+                                              @RequestParam int rating, @RequestParam String body){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Users u = userService.validate(authentication);
+        Users u = userService.getUser(authentication);
         Optional<Order> order = orderService.findById(orderId);
 
         if (order.isEmpty())

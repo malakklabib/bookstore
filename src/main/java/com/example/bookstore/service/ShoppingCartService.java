@@ -17,16 +17,20 @@ public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
 
-    public void addToCart(Users u, Book b){
-        ShoppingCart shoppingCart = u.getShoppingCart();
-        shoppingCart.addItem(b);
+    public void addToCart(Users user, Book book){
+        ShoppingCart shoppingCart = user.getShoppingCart();
+        shoppingCart.addItem(book);
         save(shoppingCart);
     }
 
-    public void removeFromCart(Users u, Book b) {
+    public String removeFromCart(Users u, Book b) {
         ShoppingCart shoppingCart = u.getShoppingCart();
-        shoppingCart.removeItem(b);
-        save(shoppingCart);
+        if(shoppingCart.getShoppingCartItems().contains(b)) {
+            shoppingCart.removeItem(b);
+            save(shoppingCart);
+            return b.getTitle() + " removed from cart.";
+        }
+        return b.getTitle() + " not found in your cart.";
     }
 
     public ShoppingCart save(ShoppingCart shoppingCart) {

@@ -28,39 +28,36 @@ public class ShoppingCartController {
 
 
     @GetMapping("/cart")
-    public ResponseEntity<List<Book>> getShoppingCartItems() throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Users u = userService.validate(authentication);
-        Optional<ShoppingCart> cart = shoppingCartService.findById(u.getShoppingCart().getShoppingCartId());
-        if(cart.isEmpty())
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(cart.get().getShoppingCartItems());
+    public ResponseEntity<?> getShoppingCartItems(Authentication authentication){
+        Users user = userService.getUser(authentication);
+        List<Book> userCartItems = user.getShoppingCart().getShoppingCartItems();
+        if (userCartItems.isEmpty())
+            return ResponseEntity.ok("Your shopping cart is empty.");
+        return ResponseEntity.ok(userCartItems);
     }
 
     @PostMapping("/books/{bookId}/addToCart")
-    public ResponseEntity<String> addToCart(@PathVariable String bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Users u = userService.validate(authentication);
+    public ResponseEntity<String> addToCart(Authentication authentication, @PathVariable String bookId){
+        Users user = userService.getUser(authentication);
 
-        Optional<Book> b = bookService.findById(bookId);
-        if (b.isEmpty())
-            return ResponseEntity.notFound().build();
+        Optional<Book> book = bookService.findById(bookId);
+        if (book.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found.");
 
-        shoppingCartService.addToCart(u, b.get());
+        shoppingCartService.addToCart(user, book.get());
         return ResponseEntity.ok("Book added to cart.");
     }
 
     @DeleteMapping("/cart/{bookId}/removeFromCart")
-    public ResponseEntity<String> removeFromCart(@PathVariable String bookId) throws Exception {
+    public ResponseEntity<String> removeFromCart(Authentication authentication, @PathVariable String bookId){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Users u = userService.validate(authentication);
-        Optional<Book> b = bookService.findById(bookId);
+        Users user = userService.getUser(authentication);
+        Optional<Book> book = bookService.findById(bookId);
 
-        if(b.isEmpty())
-            return ResponseEntity.notFound().build();
+        if (book.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found.");
 
-        shoppingCartService.removeFromCart(u, b.get());
-        return ResponseEntity.ok("Book removed from cart.");
+        String mssg = shoppingCartService.removeFromCart(user, book.get());
+        return ResponseEntity.ok(mssg);
     }
 }

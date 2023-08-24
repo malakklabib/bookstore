@@ -40,13 +40,9 @@ public class UserService {
     }
 
 
-    public Users validate(Authentication auth) throws Exception{
+    public Users getUser(Authentication auth){
         String email = auth.getName();
         Optional<Users> user = findByEmail(email);
-        if (user.isEmpty()) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            throw new Exception("user not authorized");
-        }
         return user.get();
     }
 
