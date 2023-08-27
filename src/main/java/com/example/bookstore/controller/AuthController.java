@@ -35,6 +35,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 
     @GetMapping("/u")
@@ -44,7 +45,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody AuthenticationRequest authenticationRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody @Valid AuthenticationRequest authenticationRequest, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()){
+            String s = "";
+            for(int i = 0 ; i < bindingResult.getErrorCount(); i++)
+                s+=bindingResult.getAllErrors().get(i).getDefaultMessage() + "\n";
+            logger.info(s);
+            return ResponseEntity.badRequest().body(s);
+        }
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())

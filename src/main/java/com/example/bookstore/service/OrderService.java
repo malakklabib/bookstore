@@ -39,17 +39,24 @@ public class OrderService {
 
     public List<Order> findTop3ByEmail(String email) { return orderRepository.findTop3ByUserEmail(email); }
 
-    public Order createOrder(Users u, String address, Long phoneNo) {
+    public double calculateTotal(Users u){
+        List<Book> shoppingCartItems = u.getShoppingCart().getShoppingCartItems();
+        double total = 0;
+
+        for (Book b : shoppingCartItems)
+            total += b.getPrice();
+        return total;
+    }
+
+    public Order createOrder(Users u, String address, String phoneNo, double total) {
 
         List<Book> shoppingCartItems = u.getShoppingCart().getShoppingCartItems();
         List<OrderItem> orderItems = new ArrayList<>();
-        double total = 0;
 
         for (Book b : shoppingCartItems) {
             OrderItem item = new OrderItem(b.getIsbn(), b.getPrice());
             orderItemRepository.save(item);
             orderItems.add(item);
-            total += b.getPrice();
         }
 
         u.getShoppingCart().reset();

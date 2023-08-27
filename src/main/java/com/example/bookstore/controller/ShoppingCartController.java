@@ -44,8 +44,8 @@ public class ShoppingCartController {
         if (book.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found.");
 
-        shoppingCartService.addToCart(user, book.get());
-        return ResponseEntity.ok("Book added to cart.");
+        String mssg = shoppingCartService.addToCart(user, book.get());
+        return ResponseEntity.ok(mssg);
     }
 
     @DeleteMapping("/cart/{bookId}/removeFromCart")

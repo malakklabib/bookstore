@@ -93,43 +93,22 @@ public class BookService {
     }
     public String findMostCommonCategory(Users user) {
         List<Order> orders = orderService.findTop3ByEmail(user.getEmail());
-        Map<String, Integer> categoryCountMap = new HashMap<>();
+        Map<String, Integer> categoryCount = new HashMap<>();
 
         for (Order order : orders) {
             for (OrderItem orderItem : order.getOrderItems()) {
-                Optional<Book> bookOptional = findById(orderItem.getIsbn());
-                if (bookOptional.isPresent()) {
-                    String category = bookOptional.get().getCategory();
-                    categoryCountMap.put(category, categoryCountMap.getOrDefault(category, 0) + 1);
+                Optional<Book> book = findById(orderItem.getIsbn());
+                if (book.isPresent()) {
+                    String category = book.get().getCategory();
+                    categoryCount.put(category, categoryCount.getOrDefault(category, 0) + 1);
                 }
             }
         }
 
-        if (!categoryCountMap.isEmpty()) {
-            String mostCommonCategory = Collections.max(categoryCountMap.entrySet(), Map.Entry.comparingByValue()).getKey();
-            return mostCommonCategory;
-        }
+        if (!categoryCount.isEmpty())
+            return Collections.max(categoryCount.entrySet(), Map.Entry.comparingByValue()).getKey();
 
         return "";
     }
-
-
-//    public String findMostCommonCategory(Users user) {
-//        List <Order> orders = orderService.findTop3ByEmail(user.getEmail());
-//        List<String> books = new ArrayList<>();
-//
-//        for(Order order : orders){
-//            for(OrderItem orderItem : order.getOrderItems()){
-//                Optional<Book> b = findById(orderItem.getIsbn());
-//                if(b.isEmpty())
-//                    continue;
-//                books.add(b.get().getCategory());
-//            }
-//        }
-//        List<Book> mostCommonCategory = bookRepository.findAllByIsbnInOrderByCategoryDesc(books);
-//        if(!mostCommonCategory.isEmpty())
-//            return bookRepository.findAllByIsbnInOrderByCategoryDesc(books).get(0).getCategory();
-//        return "";
-//    }
 
 }

@@ -33,7 +33,7 @@ public class Order {
     private String userEmail;
 
     @NonNull
-    private Long phoneNumber;
+    private String phoneNumber;
 
     @DBRef
     private List<OrderItem> orderItems= new ArrayList<>();

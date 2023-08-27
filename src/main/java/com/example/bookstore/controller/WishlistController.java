@@ -31,7 +31,7 @@ public class WishlistController {
         return ResponseEntity.ok(userWishlistItems);
     }
 
-    @PostMapping("books/{bookId}/addToWishlist")
+    @PostMapping("/books/{bookId}/addToWishlist")
     public ResponseEntity<String> addToWishlist(@PathVariable String bookId, Authentication authentication){
         Users user = userService.getUser(authentication);
 
@@ -43,7 +43,7 @@ public class WishlistController {
         return ResponseEntity.ok(mssg);
     }
 
-    @DeleteMapping("wishlist/{bookId}/removeFromWishlist")
+    @DeleteMapping("/wishlist/{bookId}/removeFromWishlist")
     public ResponseEntity<String> removeFromWishlist(@PathVariable String bookId, Authentication authentication){
 
         Users u = userService.getUser(authentication);

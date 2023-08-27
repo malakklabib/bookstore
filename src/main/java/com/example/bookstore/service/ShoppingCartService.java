@@ -17,10 +17,11 @@ public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
 
-    public void addToCart(Users user, Book book){
+    public String addToCart(Users user, Book book){
         ShoppingCart shoppingCart = user.getShoppingCart();
         shoppingCart.addItem(book);
         save(shoppingCart);
+        return book.getTitle() + " added to cart.";
     }
 
     public String removeFromCart(Users u, Book b) {
