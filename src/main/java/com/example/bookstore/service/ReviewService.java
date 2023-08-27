@@ -28,4 +28,17 @@ public class ReviewService {
     }
 
     public boolean isEmpty(){ return reviewRepository.findAll().isEmpty(); }
+
+    public void calculateAvgRating(Book ratedBook) {
+        List<Review> reviews = findAllByBookId(ratedBook.getIsbn());
+        int count = 0;
+        double ratings = 0;
+        for (Review review : reviews) {
+            count++;
+            ratings += review.getRating();
+        }
+
+        ratedBook.setAvgRating(ratings / count);
+
+    }
 }
