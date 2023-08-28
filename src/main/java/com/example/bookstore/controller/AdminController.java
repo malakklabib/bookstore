@@ -106,4 +106,25 @@ public class AdminController {
         return ResponseEntity.ok().body(order);
     }
 
+    @GetMapping("/popularGenres")
+    public ResponseEntity<String> popularGenres(){
+        String popularGenres = bookService.findMostPopularGenres();
+        if(popularGenres.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No books have been sold yet.");
+        return ResponseEntity.ok(popularGenres);
+    }
+
+    @GetMapping("/topSellingBooks")
+    public ResponseEntity<String> topSellingBooks(){
+        String topSellingBooks = bookService.findMostPopularBooks();
+        if(topSellingBooks.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No books have been sold yet.");
+        return ResponseEntity.ok(topSellingBooks);
+    }
+
+
+
+
+
+
 }
