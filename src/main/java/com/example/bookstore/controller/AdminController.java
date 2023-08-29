@@ -56,8 +56,7 @@ public class AdminController {
             return ResponseEntity.badRequest().body(s);
         }
 
-        updatedBook.setIsbn(id);
-        Book savedBook = bookService.save(updatedBook);
+        Book savedBook = bookService.update(id, updatedBook);
 
         return ResponseEntity.ok(savedBook);
     }
@@ -75,12 +74,12 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Book successfully deleted.");
     }
 
-    @GetMapping("/updateTracking")
-    public ResponseEntity<List<Order>> updateTracking(){
+    @GetMapping("/tracking")
+    public ResponseEntity<List<Order>> viewTracking(){
         return ResponseEntity.ok(orderService.findAll());
     }
 
-    @PutMapping("/updateTracking/{orderId}")
+    @PutMapping("/tracking/{orderId}")
     public ResponseEntity<?> updateTracking(@PathVariable String orderId){
         Optional<Order> o = orderService.findById(orderId);
         if(o.isEmpty())

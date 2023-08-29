@@ -131,12 +131,14 @@
 			<artifactId>rest-api-sdk</artifactId>
 			<version>1.4.2</version>
 		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
 
-
-
-
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

@@ -47,9 +47,9 @@ public class Book{
     @NonNull
     private double avgRating;
 
-    public boolean equals(Object o){
-        if(o instanceof Book)
-            return this.isbn.equals(((Book)o).isbn);
-        return false;
-    }
+//    public boolean equals(Object o){
+//        if(o instanceof Book)
+//            return this.isbn.equals(((Book)o).isbn);
+//        return false;
+//    }
 }

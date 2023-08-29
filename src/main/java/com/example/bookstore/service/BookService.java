@@ -23,7 +23,6 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final OrderService orderService;
-    private final UserService userService;
 
     public List<Book> findAll() {
         return bookRepository.findAll();
@@ -39,6 +38,11 @@ public class BookService {
 
     public void delete(Book book) {
         bookRepository.delete(book);
+    }
+
+    public Book update(String id, Book updatedBook) {
+        updatedBook.setIsbn(id);
+        return save(updatedBook);
     }
 
     public List<Book> findByParameters(Optional<String> title, Optional<String> author, Optional<Double> priceMin,
